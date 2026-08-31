@@ -93,10 +93,6 @@ function navigateTo(screen){
   $('screen-'+screen)?.classList.add('active');
   document.querySelector(`.nav-item[data-screen="${screen}"]`)?.classList.add('active');
 }
-document.querySelectorAll('.nav-item').forEach(item=>{
-  item.addEventListener('click',()=>navigateTo(item.dataset.screen));
-});
-
 function setProfile(name,city){
   profile={name,city};
   $('profile-name').textContent=name;

@@ -1,140 +1,101 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>DIBS – Found it. Claimed it. Built it.</title>
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>DIBS</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://thunkable.github.io/webviewer-extension/thunkableWebviewerExtension.js"></script>
 <style>
-:root{--bg:#0e0f11;--surface:#17191d;--border:#2a2d34;--accent:#3DDC84;--accent-dim:rgba(61,220,132,.12);--orange:#f59e0b;--orange-dim:rgba(245,158,11,.15);--muted:#6b7280;--muted2:#9ca3af;--text:#f1f3f5;--radius:16px;--font:'Inter',sans-serif}
+:root{--bg:#0e0f11;--surface:#17191d;--border:#2a2d34;--accent:#3DDC84;--accent-dim:rgba(61,220,132,.12);--orange:#f59e0b;--orange-dim:rgba(245,158,11,.15);--muted:#6b7280;--muted2:#9ca3af;--text:#f1f3f5;--font:'Inter',sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5}
 #app{max-width:440px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-.screen{flex:1;overflow:hidden auto;padding-bottom:16px;display:none}
+.screen{flex:1;overflow:auto;padding-bottom:16px;display:none}
 .screen.active{display:block}
 .top-bar{position:sticky;top:0;background:var(--bg);padding:16px 20px;border-bottom:1px solid var(--border)}
-.logo-text{font-size:22px;font-weight:800}
-.logo-text span{color:var(--accent)}
-.logo-sub{font-size:11px;color:var(--muted)}
-.section-label{padding:16px 20px 8px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:0 16px 12px}
+.logo{font-size:22px;font-weight:800}
+.logo span{color:var(--accent)}
+.sub{font-size:11px;color:var(--muted)}
+.label{padding:16px 20px 8px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin:0 16px 12px}
 .card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
 .card-title{font-size:16px;font-weight:700}
 .card-meta{font-size:12px;color:var(--muted);margin-top:2px}
-.cat-badge,.status-pill{border-radius:50px;font-size:11px;font-weight:700;padding:4px 10px}
-.status-verfügbar{background:var(--accent-dim);color:var(--accent)}
-.status-reserviert{background:var(--orange-dim);color:var(--orange)}
-.status-abgeholt{background:rgba(107,114,128,.15);color:var(--muted2)}
+.pill{border-radius:50px;font-size:11px;font-weight:700;padding:4px 10px}
+.s-verfügbar{background:var(--accent-dim);color:var(--accent)}
+.s-reserviert{background:var(--orange-dim);color:var(--orange)}
+.s-abgeholt{background:rgba(107,114,128,.15);color:var(--muted2)}
 .card-qty{font-size:13px;font-weight:600;color:var(--muted2);margin-top:8px}
 .empty{padding:32px;text-align:center;color:var(--muted)}
-.profile-header{padding:28px 20px;text-align:center;border-bottom:1px solid var(--border)}
+.profile{padding:28px 20px;text-align:center;border-bottom:1px solid var(--border)}
 .avatar{width:80px;height:80px;border-radius:50%;background:var(--accent-dim);border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px;font-weight:800;color:var(--accent)}
-.profile-name{font-size:22px;font-weight:800}
-.profile-meta{font-size:13px;color:var(--muted)}
-.stats-row{display:flex;justify-content:center;margin-top:20px}
+.p-name{font-size:22px;font-weight:800}
+.p-meta{font-size:13px;color:var(--muted)}
+.stats{display:flex;justify-content:center;margin-top:20px}
 .stat{flex:1;text-align:center;padding:12px 8px;border-right:1px solid var(--border)}
 .stat:last-child{border-right:none}
-.stat-val{font-size:22px;font-weight:800}
-.stat-val.green{color:var(--accent)}
-.stat-lbl{font-size:11px;color:var(--muted)}
-.bottom-nav{position:sticky;bottom:0;height:68px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
-.nav-item i{font-size:19px;color:var(--muted)}
-.nav-item span{font-size:10px;font-weight:600;color:var(--muted)}
-.nav-item.active i,.nav-item.active span{color:var(--accent)}
-</style>
-</head>
-<body>
-<div id="app">
+.stat b{display:block;font-size:22px;font-weight:800}
+.stat b.green{color:var(--accent)}
+.stat small{font-size:11px;color:var(--muted)}
+.nav{position:sticky;bottom:0;height:68px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center}
+.nav div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav i{font-size:19px;color:var(--muted)}
+.nav span{font-size:10px;font-weight:600;color:var(--muted)}
+.nav .active i,.nav .active span{color:var(--accent)}
+</style></head>
+<body><div id="app">
 
-  <div id="screen-feed" class="screen active">
-    <div class="top-bar">
-      <div class="logo-text">DI<span>B</span>S</div>
-      <div class="logo-sub">Found it. Claimed it. Built it.</div>
-    </div>
-    <div class="section-label">Aktuelle Angebote</div>
-    <div id="feed-list"></div>
-  </div>
-
-  <div id="screen-profile" class="screen">
-    <div class="profile-header">
-      <div class="avatar" id="profile-avatar">TM</div>
-      <div class="profile-name" id="profile-name">—</div>
-      <div class="profile-meta"><i class="fa-solid fa-location-dot"></i> <span id="profile-city">—</span></div>
-      <div class="stats-row">
-        <div class="stat"><div class="stat-val green" id="stat-posts">0</div><div class="stat-lbl">Posts</div></div>
-        <div class="stat"><div class="stat-val">4.8 ★</div><div class="stat-lbl">Rating</div></div>
-      </div>
-    </div>
-    <div class="section-label">Meine Posts</div>
-    <div id="mine-list"></div>
-  </div>
-
-  <div id="screen-post" class="screen"></div>
-
-  <nav class="bottom-nav">
-    <div class="nav-item active" data-screen="feed"><i class="fa-solid fa-house"></i><span>Feed</span></div>
-    <div class="nav-item" data-screen="post"><i class="fa-solid fa-plus-circle"></i><span>Posten</span></div>
-    <div class="nav-item" data-screen="profile"><i class="fa-regular fa-user"></i><span>Profil</span></div>
-  </nav>
-
+<div id="screen-feed" class="screen active">
+  <div class="top-bar"><div class="logo">DI<span>B</span>S</div><div class="sub">Found it. Claimed it. Built it.</div></div>
+  <div class="label">Aktuelle Angebote</div>
+  <div id="feed-list"></div>
 </div>
 
-<script>
-const $=id=>document.getElementById(id);
-let materials=[],profile={name:'Tischlerei Mayer',city:'Steyr'};
-const esc=s=>s==null?'':String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+<div id="screen-profile" class="screen">
+  <div class="profile">
+    <div class="avatar" id="p-avatar">TM</div>
+    <div class="p-name" id="p-name">—</div>
+    <div class="p-meta"><i class="fa-solid fa-location-dot"></i> <span id="p-city">—</span></div>
+    <div class="stats">
+      <div class="stat"><b class="green" id="stat-posts">0</b><small>Posts</small></div>
+      <div class="stat"><b>0</b><small>Weitergaben</small></div>
+      <div class="stat"><b>4.8 ★</b><small>Rating</small></div>
+    </div>
+  </div>
+  <div class="label">Meine Posts</div>
+  <div id="mine-list"></div>
+</div>
 
-function navigateTo(screen){
-  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-  $('screen-'+screen)?.classList.add('active');
-  document.querySelector(`.nav-item[data-screen="${screen}"]`)?.classList.add('active');
+<div id="screen-post" class="screen"></div>
+
+<nav class="nav">
+  <div class="active" data-screen="feed"><i class="fa-solid fa-house"></i><span>Feed</span></div>
+  <div data-screen="post"><i class="fa-solid fa-plus-circle"></i><span>Posten</span></div>
+  <div data-screen="profile"><i class="fa-regular fa-user"></i><span>Profil</span></div>
+</nav>
+
+</div>
+<script>
+const $=id=>document.getElementById(id),esc=s=>s==null?'':String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let materials=[],profile={name:'Tischlerei Mayer',city:'Steyr'};
+
+function navigateTo(s){
+  document.querySelectorAll('.screen,.nav>div').forEach(x=>x.classList.remove('active'));
+  $('screen-'+s)?.classList.add('active');
+  document.querySelector(`.nav [data-screen="${s}"]`)?.classList.add('active');
 }
 function setProfile(name,city){
   profile={name,city};
-  $('profile-name').textContent=name;
-  $('profile-city').textContent=city;
-  $('profile-avatar').textContent=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  $('p-name').textContent=name;$('p-city').textContent=city;
+  $('p-avatar').textContent=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 }
-
-function renderFeed(){
-  $('feed-list').innerHTML=materials.length?materials.map(m=>`
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">${esc(m.title)}</div>
-          <div class="card-meta">${esc(m.postedBy)}</div>
-        </div>
-        <span class="status-pill status-${m.status}">${m.status}</span>
-      </div>
-      <div class="card-qty"><i class="fa-solid fa-box"></i> ${m.qty} ${m.unit}${m.plz?` · PLZ ${esc(m.plz)}`:''}</div>
-    </div>
-  `).join(''):'<div class="empty">Keine Materialien vorhanden</div>';
+function card(m,mine){
+  return `<div class="card"><div class="card-header"><div><div class="card-title">${esc(m.title)}</div>${mine?'':`<div class="card-meta">${esc(m.postedBy)}</div>`}</div><span class="pill s-${m.status}">${m.status}</span></div><div class="card-qty">${mine?`${m.category} · `:''}${m.qty} ${m.unit}${m.plz?` · PLZ ${esc(m.plz)}`:''}</div></div>`;
 }
-
-function renderMine(){
-  const o=materials.filter(m=>m.postedBy===profile.name);
-  $('mine-list').innerHTML=o.length?o.map(m=>`
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">${esc(m.title)}</div>
-        <span class="status-pill status-${m.status}">${m.status}</span>
-      </div>
-      <div class="card-qty">${m.category} · ${m.qty} ${m.unit} · PLZ ${esc(m.plz)}</div>
-    </div>
-  `).join(''):'<div class="empty">Noch keine eigenen Posts</div>';
-  $('stat-posts').textContent=o.length;
+function renderAll(){
+  $('feed-list').innerHTML=materials.length?materials.map(m=>card(m,false)).join(''):'<div class="empty">Keine Materialien vorhanden</div>';
+  const mine=materials.filter(m=>m.postedBy===profile.name);
+  $('mine-list').innerHTML=mine.length?mine.map(m=>card(m,true)).join(''):'<div class="empty">Noch keine eigenen Posts</div>';
+  $('stat-posts').textContent=mine.length;
 }
-
-function renderAll(){renderFeed();renderMine()}
-
-const send=(action,p={})=>{
-  const m=JSON.stringify({action,...p});
-  window.ThunkableWebviewerExtension?ThunkableWebviewerExtension.postMessage(m):console.log('postMessage:',m);
-};
+const send=(action,p={})=>window.ThunkableWebviewerExtension?.postMessage(JSON.stringify({action,...p}));
 
 ThunkableWebviewerExtension.receiveMessage(msg=>{
   try{
@@ -142,11 +103,7 @@ ThunkableWebviewerExtension.receiveMessage(msg=>{
     if(o.type==='navigate'&&o.screen)navigateTo(o.screen);
     if(o.type==='loadMaterials'){materials=o.data||[];renderAll()}
     if(o.type==='setProfile'){setProfile(o.name,o.city);renderAll()}
-  }catch(e){console.error('Fehler beim Verarbeiten der Nachricht:',e)}
+  }catch(e){}
 });
-
-renderFeed();
 send('ready');
-</script>
-</body>
-</html>
+</script></body></html>

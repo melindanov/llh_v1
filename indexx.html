@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>DIBS – Found it. Claimed it. Built it.</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://thunkable.github.io/webviewer-extension/thunkableWebviewerExtension.js"></script>
+<style>
+:root{--bg:#0e0f11;--surface:#17191d;--border:#2a2d34;--accent:#3DDC84;--accent-dim:rgba(61,220,132,.12);--orange:#f59e0b;--orange-dim:rgba(245,158,11,.15);--muted:#6b7280;--muted2:#9ca3af;--text:#f1f3f5;--radius:16px;--font:'Inter',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5}
+#app{max-width:440px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.screen{flex:1;overflow:hidden auto;padding-bottom:16px;display:none}
+.screen.active{display:block}
+.top-bar{position:sticky;top:0;background:var(--bg);padding:16px 20px;border-bottom:1px solid var(--border)}
+.logo-text{font-size:22px;font-weight:800}
+.logo-text span{color:var(--accent)}
+.logo-sub{font-size:11px;color:var(--muted)}
+.section-label{padding:16px 20px 8px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:0 16px 12px}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.card-title{font-size:16px;font-weight:700}
+.card-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.cat-badge,.status-pill{border-radius:50px;font-size:11px;font-weight:700;padding:4px 10px}
+.status-verfügbar{background:var(--accent-dim);color:var(--accent)}
+.status-reserviert{background:var(--orange-dim);color:var(--orange)}
+.status-abgeholt{background:rgba(107,114,128,.15);color:var(--muted2)}
+.card-qty{font-size:13px;font-weight:600;color:var(--muted2);margin-top:8px}
+.empty{padding:32px;text-align:center;color:var(--muted)}
+.profile-header{padding:28px 20px;text-align:center;border-bottom:1px solid var(--border)}
+.avatar{width:80px;height:80px;border-radius:50%;background:var(--accent-dim);border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px;font-weight:800;color:var(--accent)}
+.profile-name{font-size:22px;font-weight:800}
+.profile-meta{font-size:13px;color:var(--muted)}
+.stats-row{display:flex;justify-content:center;margin-top:20px}
+.stat{flex:1;text-align:center;padding:12px 8px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-val{font-size:22px;font-weight:800}
+.stat-val.green{color:var(--accent)}
+.stat-lbl{font-size:11px;color:var(--muted)}
+.bottom-nav{position:sticky;bottom:0;height:68px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.nav-item i{font-size:19px;color:var(--muted)}
+.nav-item span{font-size:10px;font-weight:600;color:var(--muted)}
+.nav-item.active i,.nav-item.active span{color:var(--accent)}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="screen-feed" class="screen active">
+    <div class="top-bar">
+      <div class="logo-text">DI<span>B</span>S</div>
+      <div class="logo-sub">Found it. Claimed it. Built it.</div>
+    </div>
+    <div class="section-label">Aktuelle Angebote</div>
+    <div id="feed-list"></div>
+  </div>
+
+  <div id="screen-profile" class="screen">
+    <div class="profile-header">
+      <div class="avatar" id="profile-avatar">TM</div>
+      <div class="profile-name" id="profile-name">—</div>
+      <div class="profile-meta"><i class="fa-solid fa-location-dot"></i> <span id="profile-city">—</span></div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-val green" id="stat-posts">0</div><div class="stat-lbl">Posts</div></div>
+        <div class="stat"><div class="stat-val">4.8 ★</div><div class="stat-lbl">Rating</div></div>
+      </div>
+    </div>
+    <div class="section-label">Meine Posts</div>
+    <div id="mine-list"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-screen="feed"><i class="fa-solid fa-house"></i><span>Feed</span></div>
+    <div class="nav-item" data-screen="profile"><i class="fa-regular fa-user"></i><span>Profil</span></div>
+  </nav>
+
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let materials=[],profile={name:'Tischlerei Mayer',city:'Steyr'};
+const esc=s=>s==null?'':String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function navigateTo(screen){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  $('screen-'+screen)?.classList.add('active');
+  document.querySelector(`.nav-item[data-screen="${screen}"]`)?.classList.add('active');
+}
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>navigateTo(item.dataset.screen));
+});
+
+function setProfile(name,city){
+  profile={name,city};
+  $('profile-name').textContent=name;
+  $('profile-city').textContent=city;
+  $('profile-avatar').textContent=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function renderFeed(){
+  $('feed-list').innerHTML=materials.length?materials.map(m=>`
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${esc(m.title)}</div>
+          <div class="card-meta">${esc(m.postedBy)}</div>
+        </div>
+        <span class="status-pill status-${m.status}">${m.status}</span>
+      </div>
+      <div class="card-qty"><i class="fa-solid fa-box"></i> ${m.qty} ${m.unit}${m.plz?` · PLZ ${esc(m.plz)}`:''}</div>
+    </div>
+  `).join(''):'<div class="empty">Keine Materialien vorhanden</div>';
+}
+
+function renderMine(){
+  const o=materials.filter(m=>m.postedBy===profile.name);
+  $('mine-list').innerHTML=o.length?o.map(m=>`
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">${esc(m.title)}</div>
+        <span class="status-pill status-${m.status}">${m.status}</span>
+      </div>
+      <div class="card-qty">${m.category} · ${m.qty} ${m.unit} · PLZ ${esc(m.plz)}</div>
+    </div>
+  `).join(''):'<div class="empty">Noch keine eigenen Posts</div>';
+  $('stat-posts').textContent=o.length;
+}
+
+function renderAll(){renderFeed();renderMine()}
+
+const send=(action,p={})=>{
+  const m=JSON.stringify({action,...p});
+  window.ThunkableWebviewerExtension?ThunkableWebviewerExtension.postMessage(m):console.log('postMessage:',m);
+};
+
+ThunkableWebviewerExtension.receiveMessage(msg=>{
+  try{
+    const o=JSON.parse(msg);
+    if(o.type==='navigate'&&o.screen)navigateTo(o.screen);
+    if(o.type==='loadMaterials'){materials=o.data||[];renderAll()}
+    if(o.type==='setProfile'){setProfile(o.name,o.city);renderAll()}
+  }catch(e){console.error('Fehler beim Verarbeiten der Nachricht:',e)}
+});
+
+renderFeed();
+send('ready');
+</script>
+</body>
+</html>
